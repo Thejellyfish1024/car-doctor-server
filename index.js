@@ -28,6 +28,7 @@ async function run() {
 
     const database = client.db("carDoctorDB")
     const serviceCollection = database.collection("services")
+    const orderCollection = database.collection("orders")
 
     app.get('/services',async(req,res) =>{
         const cursor = serviceCollection.find();
@@ -43,6 +44,27 @@ async function run() {
         }
         const result = await serviceCollection.findOne(query,options)
         res.send(result)
+    })
+
+    
+    app.get('/myOrders', async(req,res) =>{
+      let query = {}
+      if(req.query?.clientEmail){
+        query = {
+          clientEmail : req?.query?.clientEmail
+        }
+      }
+      const cursor = orderCollection.find(query)
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+
+    app.post('/myOrders', async(req,res) =>{
+      const newOrder = req.body;
+      console.log('new order', newOrder);
+      const result = await orderCollection.insertOne(newOrder)
+      res.send(result)
+      
     })
 
 
